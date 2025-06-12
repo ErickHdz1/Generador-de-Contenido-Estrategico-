@@ -6,7 +6,7 @@ El sistema ofrece una interfaz sencilla, opciones de personalización de tono y 
 ## # 
 # Estructura del repositorio
 
-# En desarrollo
+## En desarrollo
 ## #
 # Contacto
 Puedes contancatrme en al31945@edec.edu.mx
