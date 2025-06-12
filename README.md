@@ -6,11 +6,6 @@ El sistema ofrece una interfaz sencilla, opciones de personalización de tono y 
 ## # 
 # Estructura del repositorio
 
-
-# BUILT WITH
-## #
-# Instalacion
-## #
 # En desarrollo
 ## #
 # Contacto
