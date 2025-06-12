@@ -4,7 +4,7 @@ Aplicación web que permite a empresas generar automáticamente borradores de co
 El sistema ofrece una interfaz sencilla, opciones de personalización de tono y funcionalidades que permiten escalar hacia una solución más robusta con autenticación, exportación y branding.
 ## # 
 # Estructura del repositorio
- [https://github.com/ErickHdz1/Generador-de-Contenido-Estrategico-/blob/8fc912d15223bb806ac9788faa0849bf2e085a2c/PROYECTO%20GENERADOR%20DE%20CONTENIDOS.pdf]
+ [(https://github.com/ErickHdz1/Generador-de-Contenido-Estrategico-/blob/8fc912d15223bb806ac9788faa0849bf2e085a2c/PROYECTO%20GENERADOR%20DE%20CONTENIDOS.pdf)] [info]
 # BUILT WITH
 ## #
 # Instalacion
