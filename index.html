@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Contenido Estratégico</title>
+    <!-- El CSS ahora está aquí, integrado en el HTML -->
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #4a69bd;
+            color: white;
+            width: 100%;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        main {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            margin: 2rem auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            color: #4a69bd;
+            border-bottom: 2px solid #eef1f6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Estilos del formulario */
+        #form-container {
+            padding-bottom: 2rem; /* Añadir espacio para separar de la lista de borradores */
+        }
+
+        #generadorForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        #generadorForm label {
+            font-weight: 600;
+            color: #555;
+            grid-column: span 2;
+        }
+
+        #generadorForm input,
+        #generadorForm select,
+        #generadorForm textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        #generadorForm input:focus,
+        #generadorForm select:focus,
+        #generadorForm textarea:focus {
+            border-color: #4a69bd;
+            outline: none;
+        }
+
+        #generadorForm input[type="text"] {
+            grid-column: span 2;
+        }
+
+        #generadorForm textarea {
+            grid-column: span 2;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        #generadorForm button {
+            grid-column: span 2;
+            background-color: #4a69bd;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #generadorForm button:hover {
+            background-color: #3b53a0;
+            transform: translateY(-2px);
+        }
+
+        /* Estilos para los borradores guardados */
+        #lista-borradores {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .borrador {
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .borrador h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        .borrador p {
+            line-height: 1.6;
+            margin: 0.75rem 0;
+        }
+
+        .borrador strong {
+            color: #4a69bd;
+        }
+
+        .borrador button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .borrador button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            #generadorForm {
+                grid-template-columns: 1fr;
+            }
+
+            #generadorForm input[type="text"],
+            #generadorForm textarea,
+            #generadorForm label,
+            #generadorForm button {
+                grid-column: span 1;
+            }
+
+            main {
+                padding: 1rem;
+                margin: 1rem;
+            }
+        }
+        
+        /* Estilos para los mensajes de notificación (fuera de la media query) */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: fadeInOut 3s forwards;
+        }
+
+        .message-box.success {
+            background-color: #27ae60;
+        }
+
+        .message-box.error {
+            background-color: #c0392b;
+        }
+
+        .message-box.info {
+            background-color: #3498db;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+    </style>
+    <script src="app.js"></script> 
+</head>
+<body>
+    <header>
+        <h1>Generador de Borradores con IA</h1>
+    </header>
+    <main>
+        <section id="form-container">
+            <h2>Crear nuevo borrador</h2>
+            <form id="generadorForm">
+                <label for="titulo">Título del Borrador:</label>
+                <input type="text" id="titulo" name="titulo" required>
+
+                <label for="tipo_contenido">Tipo de Contenido:</label>
+                <select id="tipo_contenido" name="tipo_contenido">
+                    <option value="campaña de marketing">Campaña de Marketing</option>
+                    <option value="informe">Informe</option>
+                    <option value="resumen">Resumen</option>
+                </select>
+
+                <label for="tono">Tono:</label>
+                <select id="tono" name="tono">
+                    <option value="formal">Formal</option>
+                    <option value="casual">Casual</option>
+                    <option value="creativo">Creativo</option>
+                </select>
+
+                <label for="tema_principal">Idea o tema principal:</label>
+                <textarea id="tema_principal" name="tema_principal" rows="5" required></textarea>
+
+                <button type="submit">Generar y Guardar Borrador</button>
+            </form>
+        </section>
+
+        <section id="resultados">
+            <h2>Borradores guardados</h2>
+            <div id="lista-borradores">
+            </div>
+        </section>
+    </main>
+</body>
+</html>
