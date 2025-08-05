@@ -1,15 +1,16 @@
 <?php
-$host = "localhost";
-$db_name = "contenido_estrategico";
-$username = "root";
-$password = "";
+// Configuración de la base de datos
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root'); // Tu nombre de usuario de la base de datos
+define('DB_PASSWORD', '');     // Tu contraseña de la base de datos
+define('DB_NAME', 'contenido_estrategico'); // <--- ¡NOMBRE DE LA BASE DE DATOS CORREGIDO!
 
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $exception){
-    echo "Error en la conexión: " . $exception->getMessage();
-    exit;
+// Intenta conectar a la base de datos de MySQL
+$mysqli = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+// Revisa la conexión
+if($mysqli->connect_error){
+    // Si hay un error de conexión, termina el script y muestra el error
+    die("ERROR: No se pudo conectar a la base de datos. " . $mysqli->connect_error);
 }
 ?>
-

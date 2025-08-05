@@ -4,255 +4,469 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Contenido Estratégico</title>
-    <!-- El CSS ahora está aquí, integrado en el HTML -->
+    <!-- Incluye Tailwind CSS desde CDN para los estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Configuración de Tailwind para usar la fuente Inter y colores personalizados
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              primary: '#4F46E5', // Un azul/púrpura vibrante
+              secondary: '#6366F1', // Un tono más claro de primary
+              accent: '#EC4899', // Un rosa para acentos
+              graylight: '#F9FAFB', // Gris muy claro
+              graymedium: '#E5E7EB', // Gris medio para bordes
+              graydark: '#1F2937', // Gris oscuro para texto principal
+            },
+          },
+        },
+      }
+    </script>
     <style>
-        /* Estilos generales */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef1f6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+      body {
+        font-family: 'Inter', sans-serif;
+        /* Fondo degradado para un toque moderno */
+        background: linear-gradient(to bottom right, #F3F4F6, #E0E7FF);
+      }
 
-        header {
-            background-color: #4a69bd;
-            color: white;
-            width: 100%;
-            padding: 2rem 0;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-        }
-
-        main {
-            width: 100%;
-            max-width: 900px;
-            padding: 2rem;
-            margin: 2rem auto;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        h2 {
-            color: #4a69bd;
-            border-bottom: 2px solid #eef1f6;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Estilos del formulario */
-        #form-container {
-            padding-bottom: 2rem; /* Añadir espacio para separar de la lista de borradores */
-        }
-
-        #generadorForm {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        #generadorForm label {
-            font-weight: 600;
-            color: #555;
-            grid-column: span 2;
-        }
-
-        #generadorForm input,
-        #generadorForm select,
-        #generadorForm textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-        }
-
-        #generadorForm input:focus,
-        #generadorForm select:focus,
-        #generadorForm textarea:focus {
-            border-color: #4a69bd;
-            outline: none;
-        }
-
-        #generadorForm input[type="text"] {
-            grid-column: span 2;
-        }
-
-        #generadorForm textarea {
-            grid-column: span 2;
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        #generadorForm button {
-            grid-column: span 2;
-            background-color: #4a69bd;
-            color: white;
-            padding: 1rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        #generadorForm button:hover {
-            background-color: #3b53a0;
-            transform: translateY(-2px);
-        }
-
-        /* Estilos para los borradores guardados */
-        #lista-borradores {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .borrador {
-            background-color: #f9f9f9;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .borrador h3 {
-            margin-top: 0;
-            color: #2c3e50;
-            font-size: 1.5rem;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 0.5rem;
-        }
-
-        .borrador p {
-            line-height: 1.6;
-            margin: 0.75rem 0;
-        }
-
-        .borrador strong {
-            color: #4a69bd;
-        }
-
-        .borrador button {
-            background-color: #e74c3c;
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .borrador button:hover {
-            background-color: #c0392b;
-        }
-
-        /* Responsive design */
-        @media (max-width: 600px) {
-            #generadorForm {
-                grid-template-columns: 1fr;
-            }
-
-            #generadorForm input[type="text"],
-            #generadorForm textarea,
-            #generadorForm label,
-            #generadorForm button {
-                grid-column: span 1;
-            }
-
-            main {
-                padding: 1rem;
-                margin: 1rem;
-            }
-        }
-        
-        /* Estilos para los mensajes de notificación (fuera de la media query) */
-        .message-box {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: fadeInOut 3s forwards;
-        }
-
-        .message-box.success {
-            background-color: #27ae60;
-        }
-
-        .message-box.error {
-            background-color: #c0392b;
-        }
-
-        .message-box.info {
-            background-color: #3498db;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(-20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
-        }
+      /* Animaciones para mensajes */
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeOutUp {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+      }
+      .animate-fade-in-down {
+        animation: fadeInDown 0.3s ease-out forwards;
+      }
+      .animate-fade-out-up {
+        animation: fadeOutUp 0.3s ease-in forwards;
+      }
     </style>
-    <script src="app.js"></script> 
 </head>
 <body>
-    <header>
-        <h1>Generador de Borradores con IA</h1>
-    </header>
-    <main>
-        <section id="form-container">
-            <h2>Crear nuevo borrador</h2>
-            <form id="generadorForm">
-                <label for="titulo">Título del Borrador:</label>
-                <input type="text" id="titulo" name="titulo" required>
+    <!-- Este es el contenedor donde se "montará" la aplicación de React -->
+    <div id="root"></div>
+    
+    <!-- Scripts para cargar React, ReactDOM y Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Aquí está el código de tu aplicación de React, todo en un solo lugar -->
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const App = () => {
+        // Estados para gestionar los datos de la aplicación
+        const [drafts, setDrafts] = useState([]);
+        const [title, setTitle] = useState('');
+        const [contentType, setContentType] = useState('campaña de marketing');
+        const [tone, setTone] = useState('formal');
+        const [mainIdea, setMainIdea] = useState('');
+        const [loading, setLoading] = useState(false);
+        const [generatingAI, setGeneratingAI] = useState(false);
+        const [error, setError] = useState(null);
+        const [editingDraftId, setEditingDraftId] = useState(null);
+        const [expandedDraftId, setExpandedDraftId] = useState(null); // Nuevo estado para expandir/contraer borradores
 
-                <label for="tipo_contenido">Tipo de Contenido:</label>
-                <select id="tipo_contenido" name="tipo_contenido">
-                    <option value="campaña de marketing">Campaña de Marketing</option>
-                    <option value="informe">Informe</option>
-                    <option value="resumen">Resumen</option>
-                </select>
+        // URL base de tu backend PHP. Asegúrate de que esta URL sea la correcta.
+        const API_BASE_URL = 'http://localhost/generador-contenidos-estrategico';
 
-                <label for="tono">Tono:</label>
-                <select id="tono" name="tono">
-                    <option value="formal">Formal</option>
-                    <option value="casual">Casual</option>
-                    <option value="creativo">Creativo</option>
-                </select>
+        useEffect(() => {
+          fetchDrafts();
+        }, []);
 
-                <label for="tema_principal">Idea o tema principal:</label>
-                <textarea id="tema_principal" name="tema_principal" rows="5" required></textarea>
+        // Función para obtener los borradores desde la API de PHP
+        const fetchDrafts = async () => {
+          setLoading(true);
+          setError(null);
+          try {
+            const response = await fetch(`${API_BASE_URL}/api/borradores/leer.php`);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setDrafts(data);
+          } catch (err) {
+            setError('No se pudieron cargar los borradores.');
+            console.error('Error al cargar borradores:', err);
+          } finally {
+            setLoading(false);
+          }
+        };
 
-                <button type="submit">Generar y Guardar Borrador</button>
-            </form>
-        </section>
+        // Función para manejar la creación o actualización de un borrador
+        const handleSaveDraft = async (e) => {
+          e.preventDefault();
+          if (!title || !mainIdea) {
+            setError('El título y la idea principal no pueden estar vacíos.');
+            return;
+          }
 
-        <section id="resultados">
-            <h2>Borradores guardados</h2>
-            <div id="lista-borradores">
+          setGeneratingAI(true);
+          setError(null);
+
+          let generatedContent = '';
+          // Si estamos editando, no generamos contenido nuevo, usamos el existente
+          if (editingDraftId) {
+            const currentDraft = drafts.find(d => d.id === editingDraftId);
+            generatedContent = currentDraft ? currentDraft.contenido : '';
+            setGeneratingAI(false); // No hay generación de IA al editar
+          } else {
+            try {
+              const prompt = `Genera un ${contentType} con un tono ${tone} sobre el siguiente tema: "${mainIdea}". El título es "${title}".`;
+              
+              let chatHistory = [];
+              chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+              const payload = { contents: chatHistory };
+              const apiKey = "AIzaSyBZdNcOAQHg8rLWYuqf4V9YMbIgDhAwMqE"; // <--- REEMPLAZA ESTO CON TU CLAVE REAL
+              const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+              console.log("Enviando prompt a Gemini:", prompt);
+              const aiResponse = await fetch(apiUrl, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload)
+              });
+              const aiResult = await aiResponse.json();
+              console.log("Respuesta de Gemini:", aiResult);
+
+              if (aiResult.candidates && aiResult.candidates.length > 0 &&
+                  aiResult.candidates[0].content && aiResult.candidates[0].content.parts &&
+                  aiResult.candidates[0].content.parts.length > 0) {
+                generatedContent = aiResult.candidates[0].content.parts[0].text;
+                console.log("Contenido generado por IA:", generatedContent);
+              } else {
+                throw new Error("No se pudo generar contenido con IA. La respuesta no contiene texto.");
+              }
+
+            } catch (aiError) {
+              setError(`Error al generar contenido con IA: ${aiError.message}`);
+              console.error('Error de IA:', aiError);
+              setGeneratingAI(false);
+              return;
+            } finally {
+              setGeneratingAI(false);
+            }
+          }
+
+
+          // Ahora, guardar o actualizar el borrador
+          setLoading(true);
+          try {
+            const method = editingDraftId ? 'PUT' : 'POST'; // Usar PUT para actualizar, POST para crear
+            const url = editingDraftId ? `${API_BASE_URL}/api/borradores/actualizar.php` : `${API_BASE_URL}/api/borradores/crear_test.php`;
+            
+            const bodyData = { 
+                titulo: title, 
+                contenido: generatedContent, 
+                tipo_contenido: contentType, 
+                tono: tone 
+            };
+            if (editingDraftId) {
+                bodyData.id = editingDraftId; // Añadir ID si estamos actualizando
+            }
+
+            const response = await fetch(url, {
+              method: method,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(bodyData),
+            });
+
+            const result = await response.json();
+            console.log("Respuesta de PHP al guardar/actualizar:", result);
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status} - ${result.message || 'Error desconocido'}`);
+            }
+            await fetchDrafts(); // Recargar la lista
+            // Limpiar formulario y resetear estado de edición
+            setTitle('');
+            setMainIdea('');
+            setContentType('campaña de marketing');
+            setTone('formal');
+            setEditingDraftId(null);
+            setExpandedDraftId(null); // Contraer borradores al guardar/actualizar
+          } catch (err) {
+            setError('Error al guardar/actualizar el borrador: ' + err.message);
+            console.error('Error al guardar/actualizar borrador:', err);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        // Función para cargar los datos de un borrador en el formulario para edición
+        const handleEditDraft = (draft) => {
+            setEditingDraftId(draft.id);
+            setTitle(draft.titulo);
+            setContentType(draft.tipo_contenido);
+            setTone(draft.tono);
+            setMainIdea(draft.contenido); // Usamos el contenido como "idea principal" para la edición
+            setError(null); // Limpiar cualquier error previo
+            setExpandedDraftId(null); // Contraer el borrador si estaba expandido
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Función para manejar la eliminación de un borrador
+        const handleDeleteDraft = async (id) => {
+          setLoading(true);
+          setError(null);
+          try {
+            const response = await fetch(`${API_BASE_URL}/api/borradores/eliminar.php`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ id: id }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            await fetchDrafts();
+          } catch (err) {
+            setError('Error al eliminar el borrador.');
+            console.error('Error al eliminar borrador:', err);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        // Función para contar palabras
+        const wordCount = (text) => {
+            if (!text) return 0;
+            return text.split(/\s+/).filter(word => word.length > 0).length;
+        };
+
+        // Función para copiar contenido al portapapeles
+        const handleCopyContent = (text) => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('Contenido copiado al portapapeles.'); // Usar una notificación más amigable en un entorno real
+            } catch (err) {
+                console.error('Error al copiar el texto:', err);
+                alert('No se pudo copiar el texto.');
+            }
+            document.body.removeChild(textarea);
+        };
+        
+        // Renderizado de la interfaz de usuario
+        return (
+          <div className="bg-gradient-to-br from-gray-50 to-blue-100 min-h-screen flex items-center justify-center p-4 sm:p-6 font-sans">
+            <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-10 border border-gray-100 transform transition-all duration-300 hover:scale-[1.005]">
+              <header className="text-center mb-12">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 leading-tight">
+                  Generador de Contenido Estratégico
+                </h1>
+                <p className="mt-3 text-lg text-gray-600">
+                  Crea y gestiona tus borradores de contenido con IA.
+                </p>
+              </header>
+
+              {/* Sección de Notificaciones y Errores */}
+              {loading && (
+                <div className="bg-primary-100 border-l-4 border-primary text-primary-700 p-4 mb-6 rounded-lg animate-pulse" role="alert">
+                  <p className="font-semibold">Cargando datos...</p>
+                </div>
+              )}
+              {generatingAI && (
+                <div className="bg-purple-100 border-l-4 border-purple-500 text-purple-700 p-4 mb-6 rounded-lg animate-pulse" role="alert">
+                  <p className="font-semibold">Generando contenido con IA...</p>
+                </div>
+              )}
+              {error && (
+                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg animate-fade-in-down" role="alert">
+                  <p className="font-semibold">{error}</p>
+                </div>
+              )}
+
+              {/* Formulario para crear/editar un nuevo borrador */}
+              <form onSubmit={handleSaveDraft} className="mb-12 p-8 bg-gray-50 rounded-2xl shadow-inner border border-gray-100">
+                <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-200 pb-3">
+                    {editingDraftId ? 'Editar Borrador Existente' : 'Crear Nuevo Borrador'}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="col-span-full">
+                    <label htmlFor="title" className="block text-gray-700 text-sm font-semibold mb-2">
+                      Título del Borrador
+                    </label>
+                    <input
+                      type="text"
+                      id="title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-200 shadow-sm"
+                      placeholder="Ej. Estrategia de Marketing Digital"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="contentType" className="block text-gray-700 text-sm font-semibold mb-2">
+                      Tipo de Contenido
+                    </label>
+                    <select
+                      id="contentType"
+                      value={contentType}
+                      onChange={(e) => setContentType(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-200 shadow-sm bg-white"
+                    >
+                      <option value="campaña de marketing">Campaña de Marketing</option>
+                      <option value="informe">Informe</option>
+                      <option value="resumen">Resumen</option>
+                      <option value="articulo de blog">Artículo de Blog</option>
+                      <option value="correo electronico">Correo Electrónico</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="tone" className="block text-gray-700 text-sm font-semibold mb-2">
+                      Tono
+                    </label>
+                    <select
+                      id="tone"
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-200 shadow-sm bg-white"
+                    >
+                      <option value="formal">Formal</option>
+                      <option value="casual">Casual</option>
+                      <option value="creativo">Creativo</option>
+                      <option value="profesional">Profesional</option>
+                      <option value="amigable">Amigable</option>
+                    </select>
+                  </div>
+
+                  <div className="col-span-full">
+                    <label htmlFor="mainIdea" className="block text-gray-700 text-sm font-semibold mb-2">
+                      Idea o tema principal
+                    </label>
+                    <textarea
+                      id="mainIdea"
+                      value={mainIdea}
+                      onChange={(e) => setMainIdea(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-200 shadow-sm"
+                      rows="6"
+                      placeholder="Describe la idea principal para que la IA genere el contenido..."
+                      required
+                    ></textarea>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || generatingAI}
+                  className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 mt-6 transform hover:scale-[1.01]"
+                >
+                  {generatingAI ? 'Generando IA...' : (loading ? 'Guardando...' : (editingDraftId ? 'Actualizar Borrador' : 'Generar y Guardar Borrador'))}
+                </button>
+                {editingDraftId && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setEditingDraftId(null);
+                            setTitle('');
+                            setMainIdea('');
+                            setContentType('campaña de marketing');
+                            setTone('formal');
+                            setError(null);
+                        }}
+                        className="w-full bg-gray-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200 mt-2 transform hover:scale-[1.01]"
+                    >
+                        Cancelar Edición
+                    </button>
+                )}
+              </form>
+
+              {/* Lista de borradores guardados */}
+              <div className="p-8 bg-gray-50 rounded-2xl shadow-inner border border-gray-100">
+                <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-200 pb-3">Borradores Guardados</h2>
+                {drafts.length === 0 && !loading && (
+                  <p className="text-gray-500 text-center text-lg">No hay borradores guardados.</p>
+                )}
+                <ul className="space-y-6">
+                  {drafts.map((draft) => (
+                    <li key={draft.id} className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col transform transition-all duration-200 hover:scale-[1.005] hover:shadow-xl">
+                      <div className="flex justify-between items-center mb-3">
+                          {/* Fecha de Creación y Modelo (placeholder) */}
+                          <span className="text-xs text-gray-500 flex items-center gap-2">
+                              {draft.fecha_creacion && (
+                                  <>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                      {new Date(draft.fecha_creacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                  </>
+                              )}
+                              <span className="ml-2 px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold">Gemini</span>
+                          </span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800 break-words mb-2">{draft.titulo}</h3>
+                      {/* Contenido: snippet o completo */}
+                      <div>
+                          <p className="text-base text-gray-700 break-words leading-relaxed">
+                              {expandedDraftId === draft.id ? draft.contenido : `${draft.contenido.substring(0, 200)}${draft.contenido.length > 200 ? '...' : ''}`}
+                          </p>
+                          {draft.contenido.length > 200 && (
+                              <button
+                                  onClick={() => setExpandedDraftId(expandedDraftId === draft.id ? null : draft.id)}
+                                  className="text-primary hover:underline text-sm mt-1 focus:outline-none"
+                              >
+                                  {expandedDraftId === draft.id ? 'Ver menos' : 'Ver más'}
+                              </button>
+                          )}
+                      </div>
+                      <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
+                          {/* Contador de palabras */}
+                          <span className="font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                              {wordCount(draft.contenido)} palabras
+                          </span>
+                          {/* Botones de acción */}
+                          <div className="flex space-x-3">
+                              <button
+                                onClick={() => handleCopyContent(draft.contenido)}
+                                className="p-3 rounded-full text-blue-500 bg-blue-100 hover:bg-blue-200 transition duration-200 transform hover:scale-110 shadow-sm"
+                                aria-label="Copiar borrador"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v2"/></svg>
+                              </button>
+                              <button
+                                onClick={() => handleEditDraft(draft)}
+                                className="p-3 rounded-full text-primary bg-primary-100 hover:bg-primary-200 transition duration-200 transform hover:scale-110 shadow-sm"
+                                aria-label={`Editar borrador ${draft.titulo}`}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteDraft(draft.id)}
+                                className="p-3 rounded-full text-red-500 bg-red-100 hover:bg-red-200 transition duration-200 transform hover:scale-110 shadow-sm"
+                                aria-label={`Eliminar borrador ${draft.titulo}`}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                              </button>
+                          </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-        </section>
-    </main>
+          </div>
+        );
+      };
+      
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
 </body>
 </html>
