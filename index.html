@@ -51,38 +51,32 @@
     </style>
 </head>
 <body>
-    <!-- Este es el contenedor donde se "montará" la aplicación de React -->
     <div id="root"></div>
     
-    <!-- Scripts para cargar React, ReactDOM y Babel -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Aquí está el código de tu aplicación de React, todo en un solo lugar -->
     <script type="text/babel">
       const { useState, useEffect } = React;
       const App = () => {
-        // Estados para gestionar los datos de la aplicación
         const [drafts, setDrafts] = useState([]);
         const [title, setTitle] = useState('');
         const [contentType, setContentType] = useState('campaña de marketing');
         const [tone, setTone] = useState('formal');
-        const [mainIdea, setMainIdea] = useState('');
+        const [mainIdea, setMainIdea] = useState(''); // Estado para la idea principal / contenido editado
         const [loading, setLoading] = useState(false);
         const [generatingAI, setGeneratingAI] = useState(false);
         const [error, setError] = useState(null);
         const [editingDraftId, setEditingDraftId] = useState(null);
-        const [expandedDraftId, setExpandedDraftId] = useState(null); // Nuevo estado para expandir/contraer borradores
+        const [expandedDraftId, setExpandedDraftId] = useState(null);
 
-        // URL base de tu backend PHP. Asegúrate de que esta URL sea la correcta.
-        const API_BASE_URL = 'http://localhost/generador-contenidos-estrategico';
+        const API_BASE_URL = 'https://gestion-de-contenidos.wuaze.com'; 
 
         useEffect(() => {
           fetchDrafts();
         }, []);
 
-        // Función para obtener los borradores desde la API de PHP
         const fetchDrafts = async () => {
           setLoading(true);
           setError(null);
@@ -101,80 +95,77 @@
           }
         };
 
-        // Función para manejar la creación o actualización de un borrador
         const handleSaveDraft = async (e) => {
           e.preventDefault();
-          if (!title || !mainIdea) {
+          if (!title || !mainIdea) { 
             setError('El título y la idea principal no pueden estar vacíos.');
             return;
           }
 
-          setGeneratingAI(true);
+          setGeneratingAI(true); 
           setError(null);
 
-          let generatedContent = '';
-          // Si estamos editando, no generamos contenido nuevo, usamos el existente
-          if (editingDraftId) {
-            const currentDraft = drafts.find(d => d.id === editingDraftId);
-            generatedContent = currentDraft ? currentDraft.contenido : '';
-            setGeneratingAI(false); // No hay generación de IA al editar
-          } else {
-            try {
-              const prompt = `Genera un ${contentType} con un tono ${tone} sobre el siguiente tema: "${mainIdea}". El título es "${title}".`;
-              
-              let chatHistory = [];
-              chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-              const payload = { contents: chatHistory };
-              const apiKey = "AIzaSyBZdNcOAQHg8rLWYuqf4V9YMbIgDhAwMqE"; // <--- REEMPLAZA ESTO CON TU CLAVE REAL
-              const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+          let contentToSave = ''; 
+          try {
+            // *** ESTA LÓGICA DE GENERACIÓN DE IA AHORA SE EJECUTA SIEMPRE AL GUARDAR ***
+            // El prompt usará siempre el título, la idea principal (mainIdea), el tipo y el tono actuales del formulario
+            const prompt = `Genera un ${contentType} con un tono ${tone} sobre el siguiente tema: "${mainIdea}". El título es "${title}".`;
+            
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = "AIzaSyBZdNcOAQHg8rLWYuqf4V9YMbIgDhAwMqE"; // <--- REEMPLAZA ESTO CON TU CLAVE REAL DE GEMINI
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-              console.log("Enviando prompt a Gemini:", prompt);
-              const aiResponse = await fetch(apiUrl, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload)
-              });
-              const aiResult = await aiResponse.json();
-              console.log("Respuesta de Gemini:", aiResult);
+            console.log("Enviando prompt a Gemini:", prompt);
+            const aiResponse = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const aiResult = await aiResponse.json();
+            console.log("Respuesta de Gemini:", aiResult);
 
-              if (aiResult.candidates && aiResult.candidates.length > 0 &&
-                  aiResult.candidates[0].content && aiResult.candidates[0].content.parts &&
-                  aiResult.candidates[0].content.parts.length > 0) {
-                generatedContent = aiResult.candidates[0].content.parts[0].text;
-                console.log("Contenido generado por IA:", generatedContent);
-              } else {
-                throw new Error("No se pudo generar contenido con IA. La respuesta no contiene texto.");
-              }
-
-            } catch (aiError) {
-              setError(`Error al generar contenido con IA: ${aiError.message}`);
-              console.error('Error de IA:', aiError);
-              setGeneratingAI(false);
-              return;
-            } finally {
-              setGeneratingAI(false);
+            if (aiResult.candidates && aiResult.candidates.length > 0 &&
+                aiResult.candidates[0].content && aiResult.candidates[0].content.parts &&
+                aiResult.candidates[0].content.parts.length > 0) {
+              contentToSave = aiResult.candidates[0].content.parts[0].text; 
+              console.log("Contenido generado por IA:", contentToSave);
+            } else {
+              throw new Error("No se pudo generar contenido con IA. La respuesta no contiene texto.");
             }
+
+          } catch (aiError) {
+            setError(`Error al generar contenido con IA: ${aiError.message}`);
+            console.error('Error de IA:', aiError);
+            setGeneratingAI(false);
+            return;
+          } finally {
+            setGeneratingAI(false);
           }
 
 
-          // Ahora, guardar o actualizar el borrador
           setLoading(true);
           try {
-            const method = editingDraftId ? 'PUT' : 'POST'; // Usar PUT para actualizar, POST para crear
-            const url = editingDraftId ? `${API_BASE_URL}/api/borradores/actualizar.php` : `${API_BASE_URL}/api/borradores/crear_test.php`;
-            
-            const bodyData = { 
+            const method = 'POST'; 
+            let url = '';
+            let bodyData = { 
                 titulo: title, 
-                contenido: generatedContent, 
+                contenido: contentToSave, 
                 tipo_contenido: contentType, 
                 tono: tone 
             };
+
             if (editingDraftId) {
-                bodyData.id = editingDraftId; // Añadir ID si estamos actualizando
+                url = `${API_BASE_URL}/api/borradores/actualizar.php`;
+                bodyData.id = editingDraftId; 
+                bodyData._method = 'PUT'; 
+            } else {
+                url = `${API_BASE_URL}/api/borradores/crear_test.php`;
             }
 
             const response = await fetch(url, {
-              method: method,
+              method: method, 
               headers: {
                 'Content-Type': 'application/json',
               },
@@ -187,14 +178,13 @@
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status} - ${result.message || 'Error desconocido'}`);
             }
-            await fetchDrafts(); // Recargar la lista
-            // Limpiar formulario y resetear estado de edición
+            await fetchDrafts();
             setTitle('');
             setMainIdea('');
             setContentType('campaña de marketing');
             setTone('formal');
             setEditingDraftId(null);
-            setExpandedDraftId(null); // Contraer borradores al guardar/actualizar
+            setExpandedDraftId(null);
           } catch (err) {
             setError('Error al guardar/actualizar el borrador: ' + err.message);
             console.error('Error al guardar/actualizar borrador:', err);
@@ -203,29 +193,28 @@
           }
         };
 
-        // Función para cargar los datos de un borrador en el formulario para edición
         const handleEditDraft = (draft) => {
             setEditingDraftId(draft.id);
             setTitle(draft.titulo);
             setContentType(draft.tipo_contenido);
             setTone(draft.tono);
-            setMainIdea(draft.contenido); // Usamos el contenido como "idea principal" para la edición
-            setError(null); // Limpiar cualquier error previo
-            setExpandedDraftId(null); // Contraer el borrador si estaba expandido
+            // Cuando editas, la "Idea o tema principal" se convierte en el contenido actual del borrador
+            setMainIdea(draft.contenido); 
+            setError(null);
+            setExpandedDraftId(null);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // Función para manejar la eliminación de un borrador
         const handleDeleteDraft = async (id) => {
           setLoading(true);
           setError(null);
           try {
             const response = await fetch(`${API_BASE_URL}/api/borradores/eliminar.php`, {
-              method: 'DELETE',
+              method: 'POST', 
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ id: id }),
+              body: JSON.stringify({ id: id, _method: 'DELETE' }), 
             });
 
             if (!response.ok) {
@@ -239,14 +228,12 @@
             setLoading(false);
           }
         };
-
-        // Función para contar palabras
+        
         const wordCount = (text) => {
             if (!text) return 0;
             return text.split(/\s+/).filter(word => word.length > 0).length;
         };
 
-        // Función para copiar contenido al portapapeles
         const handleCopyContent = (text) => {
             const textarea = document.createElement('textarea');
             textarea.value = text;
@@ -254,7 +241,7 @@
             textarea.select();
             try {
                 document.execCommand('copy');
-                alert('Contenido copiado al portapapeles.'); // Usar una notificación más amigable en un entorno real
+                alert('Contenido copiado al portapapeles.');
             } catch (err) {
                 console.error('Error al copiar el texto:', err);
                 alert('No se pudo copiar el texto.');
@@ -262,7 +249,6 @@
             document.body.removeChild(textarea);
         };
         
-        // Renderizado de la interfaz de usuario
         return (
           <div className="bg-gradient-to-br from-gray-50 to-blue-100 min-h-screen flex items-center justify-center p-4 sm:p-6 font-sans">
             <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-10 border border-gray-100 transform transition-all duration-300 hover:scale-[1.005]">
@@ -372,7 +358,7 @@
                 >
                   {generatingAI ? 'Generando IA...' : (loading ? 'Guardando...' : (editingDraftId ? 'Actualizar Borrador' : 'Generar y Guardar Borrador'))}
                 </button>
-                {editingDraftId && (
+                {editingDraftId && ( 
                     <button
                         type="button"
                         onClick={() => {

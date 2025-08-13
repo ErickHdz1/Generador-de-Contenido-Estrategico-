@@ -12,7 +12,7 @@ const App = () => {
 
   // URL base de tu backend PHP. Asegúrate de que esta URL sea la correcta.
   // Por ahora, usamos una URL local.
-  const API_BASE_URL = 'http://localhost/generador-contenidos-estrategico'; 
+  const API_BASE_URL = 'https://gestion-de-contenidos.wuaze.com'; 
 
   // useEffect se ejecuta una vez al cargar el componente para leer los borradores
   useEffect(() => {
